@@ -4,7 +4,13 @@ A command-line tool to score and rank contributors
 based on their activity over a set of projects
 by analyzing Git histories.
 
-The usage of the tool is summarized below:
+## Requirements
+
+- Git (1.7x or newer)
+- Python >= 3.7
+- GitPython (installed by `pip install GitPython`)
+
+## Usage
 
 ```bash
 ./score-and-rank-contributors \
@@ -63,8 +69,8 @@ where each line provides some extra information
 about a contributor.
 
 ```
-Contributor A <name_a1@comp_a1> <name_a2@comp_a2> <name_a3@comp_a3>
-Contributor B's Display Name <name_b1@comp_b1>
+<Contributor_A> <name_a1@comp_a1> <name_a2@comp_a2> <name_a3@comp_a3>
+<Contributor_B's Display Name> <name_b1@comp_b1>
 ```
 
 Providing the `author_list` file serves two purposes.
