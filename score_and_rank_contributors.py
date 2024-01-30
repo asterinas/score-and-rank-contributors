@@ -53,6 +53,10 @@ def parse_authors_file(file_path):
 
 # Define a function to rank and output data
 def output_ranked_scores(scores):
+    # blacklist
+    scores.pop("Github Action", None)
+    scores.pop("action@github.com", None)
+
     ranked = sorted(scores.items(), key=lambda x: x[1], reverse=True)
     output = []
     for rank, (name, score) in enumerate(ranked, start=1):
@@ -61,6 +65,7 @@ def output_ranked_scores(scores):
 
 def main():
     args = parse_args()
+    # create a email-name map in advance and update it use args.authors
     authors_map = parse_authors_file(args.authors) if args.authors else {}
     scores = calculate_scores(args.projects, args.since, authors_map)
     print(output_ranked_scores(scores))
