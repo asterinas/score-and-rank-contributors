@@ -4,6 +4,7 @@
 import argparse
 import math
 import json
+import re
 from git import Repo
 from collections import defaultdict
 
@@ -33,9 +34,21 @@ def parse_authors_file(file_path):
     with open(file_path, 'r') as file:
         for line in file:
             parts = line.strip().split()
-            display_name = parts[0]
-            for email in parts[1:]:
-                authors_map[email] = display_name
+            name = []
+            emailIdx = 0
+            # deal with name
+            for idx, part in enumerate(parts):
+                matched = re.match(r"<(.+?)>",part)
+                if matched:
+                    emailIdx = idx
+                    break
+                name.append(part)
+            name = " ".join(name)
+            #deal with email
+            for part in parts[emailIdx:]:
+                matched = re.match(r"<(.+?)>",part)
+                assert matched
+                authors_map[matched.group(1)] = name
     return authors_map
 
 # Define a function to rank and output data
