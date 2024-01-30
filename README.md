@@ -69,8 +69,8 @@ where each line provides some extra information
 about a contributor.
 
 ```
-<Contributor_A> <name_a1@comp_a1> <name_a2@comp_a2> <name_a3@comp_a3>
-<Contributor_B's Display Name> <name_b1@comp_b1>
+Contributor A <name_a1@comp_a1> <name_a2@comp_a2> <name_a3@comp_a3>
+Contributor B's Display Name> <name_b1@comp_b1>
 ```
 
 Providing the `author_list` file serves two purposes.
