@@ -4,11 +4,15 @@ A command-line tool to score and rank contributors
 based on their activity over a set of projects
 by analyzing Git histories.
 
-## Usage
+The usage of the tool is summarized below:
 
 ```bash
-./score-and-rank-contributors [--since since_date] [--authors author_list] project_1 ... project_N
+./score-and-rank-contributors \
+    [--since since_date] [--authors author_list] \
+    project_1 ... project_N
 ```
+
+## Basic Usage
 
 The command extracts and accumulates contributor statistics
 from the Git histories in the given project directories
@@ -54,8 +58,9 @@ may be given
 so that only the commits authored since `since_date` count.
 
 An optional `author_list` argument may be given
-to specify a text file
-that provides some extra information about the contributors.
+to specify a text file,
+where each line provides some extra information
+about a contributor.
 
 ```
 Contributor A <name_a1@comp_a1> <name_a2@comp_a2> <name_a3@comp_a3>
