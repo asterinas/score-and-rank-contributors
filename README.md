@@ -13,9 +13,7 @@ by analyzing Git histories.
 ## Usage
 
 ```bash
-./score-and-rank-contributors \
-    [--since since_date] [--authors author_list] \
-    project_1 ... project_N
+python score_and_rank_contributors.py [--since since_date] [--authors author_list] project_1 ... project_N
 ```
 
 ## Basic Usage
@@ -31,7 +29,7 @@ The command outputs a JSON array of contributors, ranked by score.
 Here is an example command.
 
 ```bash
-./score-and-rank-contributors --since 2022-01-01 --authors contributors.txt my_project
+python score_and_rank_contributors.py --since 2022-01-01 --authors contributors.txt my_project
 ```
 
 Here is an example output.
@@ -70,7 +68,7 @@ about a contributor.
 
 ```
 Contributor A <name_a1@comp_a1> <name_a2@comp_a2> <name_a3@comp_a3>
-Contributor B's Display Name> <name_b1@comp_b1>
+Contributor B's Display Name <name_b1@comp_b1>
 ```
 
 Providing the `author_list` file serves two purposes.
