@@ -16,23 +16,34 @@ def parse_args():
     parser.add_argument('projects', nargs='+', help='List of project directories')
     return parser.parse_args()
 
+def extract_author_map(projects, since_date):
+    git_authors_map = {}
+    for project in projects:
+        repo = Repo(project)
+        for commit in repo.iter_commits(since=since_date):
+            # use the latest name
+            git_authors_map[commit.author.email] = commit.author.name
+    return git_authors_map
+
 # Define a function to calculate scores
-def calculate_scores(projects, since_date, authors_map):
+def calculate_scores(projects, since_date):
     scores = defaultdict(int)
     for project in projects:
         repo = Repo(project)
         for commit in repo.iter_commits(since=since_date):
+            if "Merge pull request #" in commit.message: 
+                continue
             email = commit.author.email
-            author = authors_map.get(email, email)
-            scores[author] += 1  # score for a commit
-            scores[author] += math.ceil(commit.stats.total['lines'] / 100)  # score for line changes
+            scores[email] += 1  # score for a commit
+            scores[email] += math.ceil(commit.stats.total['lines'] / 100)  # score for line changes
     return scores
 
 # Define a function to parse the authors file
 def parse_authors_file(file_path):
+    is_email_appeared = {} # we mush check there is no same email in the whole file.
     authors_map = {}
     with open(file_path, 'r') as file:
-        for line in file:
+        for lid, line in enumerate(file):
             parts = line.strip().split()
             name = []
             emailIdx = 0
@@ -44,31 +55,47 @@ def parse_authors_file(file_path):
                     break
                 name.append(part)
             name = " ".join(name)
+            assert emailIdx > 0, "there must be at least one emails"
+
             #deal with email
+            authors_map[(lid,name)] = []
             for part in parts[emailIdx:]:
                 matched = re.match(r"<(.+?)>",part)
                 assert matched
-                authors_map[matched.group(1)] = name
+                email = matched.group(1)
+
+                # check email has never appeared before.
+                assert email not in is_email_appeared
+                is_email_appeared[email] = 1
+
+                authors_map[(lid,name)].append(email)
     return authors_map
 
 # Define a function to rank and output data
-def output_ranked_scores(scores):
+def output_ranked_scores(scores, authors_map, same_authors):
+    # merge the same contributors
+    for (_, name), emails in same_authors.items():
+        final_email = emails[0]
+        for email in emails:
+            authors_map[email] = name
+            if email != final_email:
+                scores[final_email] += scores[email]
+                scores.pop(email,None)
     # blacklist
-    scores.pop("Github Action", None)
     scores.pop("action@github.com", None)
 
     ranked = sorted(scores.items(), key=lambda x: x[1], reverse=True)
     output = []
-    for rank, (name, score) in enumerate(ranked, start=1):
-        output.append({'rank': rank, 'name': name, 'score': score})
+    for rank, (email, score) in enumerate(ranked, start=1):
+        output.append({'rank': rank, 'name': authors_map[email], 'score': score})
     return json.dumps(output, indent=3)
 
 def main():
     args = parse_args()
-    # create a email-name map in advance and update it use args.authors
-    authors_map = parse_authors_file(args.authors) if args.authors else {}
-    scores = calculate_scores(args.projects, args.since, authors_map)
-    print(output_ranked_scores(scores))
+    authors_map = extract_author_map(args.projects, args.since)
+    same_authors = parse_authors_file(args.authors) if args.authors else {}
+    scores = calculate_scores(args.projects, args.since)
+    print(output_ranked_scores(scores, authors_map, same_authors))
 
 if __name__ == "__main__":
     main()
