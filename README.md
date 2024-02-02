@@ -4,20 +4,12 @@ A command-line tool to score and rank contributors
 based on their activity over a set of projects
 by analyzing Git histories.
 
-
-## Requirements
-
-- Git (1.7x or newer)
-- Python >= 3.7
-- GitPython (installed by `pip install GitPython`)
-
 ## Usage
 
 The usage of the tool is summarized below:
 
 ```bash
-python score_and_rank_contributors.py [--since since_date] [--authors author_list] project_1 ... project_N
-
+./score-and-rank-contributors [--since since_date] [--authors author_list] project_1 ... project_N
 ```
 
 ## Basic Usage
@@ -33,7 +25,7 @@ The command outputs a JSON array of contributors, ranked by score.
 Here is an example command.
 
 ```bash
-python score_and_rank_contributors.py --since 2022-01-01 --authors contributors.txt my_project
+./score-and-rank-contributors.py --since 2022-01-01 --authors contributors.txt my_project
 ```
 
 Here is an example output.
