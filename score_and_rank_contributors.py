@@ -1,5 +1,3 @@
-#! /usr/bin/env python
-
 # Import required libraries
 import argparse
 import math

@@ -21,14 +21,11 @@ class TestScoreAndRankContributors(unittest.TestCase):
 
         # Test the function
         result = parse_authors_file('temp_author_list.txt')
-
         self.assertEqual(result, expected_result)
 
         # Clean up
         os.remove('temp_author_list.txt')
         
-
-
     def test_calculate_scores(self):
         repo_url = "https://github.com/anminliu/score-and-rank-contributors.git"
         actual_scores = None
