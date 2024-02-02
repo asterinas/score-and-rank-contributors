@@ -4,6 +4,7 @@ A command-line tool to score and rank contributors
 based on their activity over a set of projects
 by analyzing Git histories.
 
+
 ## Requirements
 
 - Git (1.7x or newer)
@@ -12,8 +13,11 @@ by analyzing Git histories.
 
 ## Usage
 
+The usage of the tool is summarized below:
+
 ```bash
 python score_and_rank_contributors.py [--since since_date] [--authors author_list] project_1 ... project_N
+
 ```
 
 ## Basic Usage
