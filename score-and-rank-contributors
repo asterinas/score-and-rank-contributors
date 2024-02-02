@@ -1,9 +1,11 @@
+#! /bin/env python
 # Import required libraries
 import argparse
 import math
 import json
 import re
-from git import Repo
+# from git import Repo
+import subprocess
 from collections import defaultdict
 
 # Define a function to parse command-line arguments
@@ -14,26 +16,53 @@ def parse_args():
     parser.add_argument('projects', nargs='+', help='List of project directories')
     return parser.parse_args()
 
-def extract_author_map(projects, since_date):
+def run_git_log_command(repo_path, command, since_date):
+    raw_command = ['git', '-C', repo_path, 'log']
+    if since_date is not None:
+        raw_command.append(f'--since={since_date}')
+    completed_process = subprocess.run(raw_command+command, capture_output=True, text=True)
+    if completed_process.returncode == 0:
+        return completed_process.stdout
+    else:
+        raise RuntimeError(f"Git command failed with message: {completed_process.stderr}")
+
+def extract_author_map(repos, since_date):
     git_authors_map = {}
-    for project in projects:
-        repo = Repo(project)
-        for commit in repo.iter_commits(since=since_date):
-            # use the latest name
-            git_authors_map[commit.author.email] = commit.author.name
+    log_command = [r'--pretty=format:%ae %an',]
+    for repo_path in repos:
+        log_output = run_git_log_command(str(repo_path), log_command, since_date)
+        for line in log_output.splitlines():
+            line_list = line.strip().split(' ')
+            email, name = line_list[0], " ".join(line_list[1:])
+            git_authors_map[email] = name
     return git_authors_map
 
-# Define a function to calculate scores
-def calculate_scores(projects, since_date):
+def calculate_scores(repos, since_date):
     scores = defaultdict(int)
-    for project in projects:
-        repo = Repo(project)
-        for commit in repo.iter_commits(since=since_date):
-            if "Merge pull request #" in commit.message: 
+    log_command = ['--pretty=format:%ae %s', '--shortstat']
+    for repo_path in repos:
+        log_output = run_git_log_command(str(repo_path), log_command, since_date)
+
+        # split by blank line
+        for commit in log_output.split("\n\n"):
+            lines = commit.strip().splitlines()
+            # <email> <message subject>
+            # # file changed, # insertion(+), # deletion(-)
+            assert len(lines) == 2
+            parts = lines[0].split(" ")
+            email, message = parts[0], " ".join(parts[1:])
+            if message.startswith("Merge pull request #"): #remove pull request merge commit
                 continue
-            email = commit.author.email
-            scores[email] += 1  # score for a commit
-            scores[email] += math.ceil(commit.stats.total['lines'] / 100)  # score for line changes
+
+            parts = lines[1].strip().split(", ")
+            insertions = deletions = 0
+            for part in parts:
+                if "insertion" in part:
+                    insertions = int(part.split()[0])
+                elif "deletion" in part:
+                    deletions = int(part.split()[0])
+            scores[email] += 1 + math.ceil((insertions+deletions) / 100)
+    
     return scores
 
 # Define a function to parse the authors file
@@ -90,6 +119,11 @@ def output_ranked_scores(scores, authors_map, same_authors):
 
 def main():
     args = parse_args()
+
+    # check since format.
+    if args.since is not None:
+        assert re.match(r'^\d{4}-\d{2}-\d{2}$', args.since)
+
     authors_map = extract_author_map(args.projects, args.since)
     same_authors = parse_authors_file(args.authors) if args.authors else {}
     scores = calculate_scores(args.projects, args.since)
