@@ -1,4 +1,5 @@
 #! /bin/env bash
+set -e
 
 echo '''Alice <alice@comp.com>
 Lam <lam@comp1.com> <lam@comp2.com>''' > author_list.txt
