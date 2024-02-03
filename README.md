@@ -4,8 +4,6 @@ A command-line tool to score and rank contributors
 based on their activity over a set of projects
 by analyzing Git histories.
 
-## Usage
-
 The usage of the tool is summarized below:
 
 ```bash
@@ -25,7 +23,7 @@ The command outputs a JSON array of contributors, ranked by score.
 Here is an example command.
 
 ```bash
-./score-and-rank-contributors.py --since 2022-01-01 --authors contributors.txt my_project
+./score-and-rank-contributors --since 2022-01-01 --authors contributors.txt my_project
 ```
 
 Here is an example output.
