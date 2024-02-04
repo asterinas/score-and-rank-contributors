@@ -46,15 +46,14 @@ def calculate_scores(repos, since_date):
         # split by blank line
         for commit in log_output.split("\n\n"):
             lines = commit.strip().splitlines()
+            # Several merge pull request commit without statistics
             # <email> <message subject>
             # # file changed, # insertion(+), # deletion(-)
-            assert len(lines) == 2
-            parts = lines[0].split(" ")
-            email, message = parts[0], " ".join(parts[1:])
-            if message.startswith("Merge pull request #"): #remove pull request merge commit
-                continue
+            assert len(lines) >= 2
+            parts = lines[-2].split(" ")
+            email, _ = parts[0], " ".join(parts[1:])
 
-            parts = lines[1].strip().split(", ")
+            parts = lines[-1].strip().split(", ")
             insertions = deletions = 0
             for part in parts:
                 if "insertion" in part:

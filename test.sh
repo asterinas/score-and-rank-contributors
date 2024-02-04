@@ -15,7 +15,7 @@ echo '''[
    {
       "rank": 2,
       "name": "Lam",
-      "score": 6
+      "score": 8
    }
 ]'''  > expected.txt
 
