@@ -31,6 +31,7 @@ def extract_author_map(repos, since_date):
     log_command = [r'--pretty=format:%ae %an',]
     for repo_path in repos:
         log_output = run_git_log_command(str(repo_path), log_command, since_date)
+        if log_output == "": continue # skip the blank git log
         for line in log_output.splitlines():
             line_list = line.strip().split(' ')
             email, name = line_list[0], " ".join(line_list[1:])
@@ -42,14 +43,14 @@ def calculate_scores(repos, since_date):
     log_command = ['--pretty=format:%ae %s', '--shortstat']
     for repo_path in repos:
         log_output = run_git_log_command(str(repo_path), log_command, since_date)
-
+        if log_output == "": continue # skip the blank git log 
         # split by blank line
         for commit in log_output.split("\n\n"):
             lines = commit.strip().splitlines()
             # Several merge pull request commit without statistics
             # <email> <message subject>
             # # file changed, # insertion(+), # deletion(-)
-            assert len(lines) >= 2
+            assert len(lines) >= 2, f"repo_path: {repo_path}, log_output: {repr(log_output)}"
             parts = lines[-2].split(" ")
             email, _ = parts[0], " ".join(parts[1:])
 
