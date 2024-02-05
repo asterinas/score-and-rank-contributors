@@ -104,10 +104,11 @@ def output_ranked_scores(scores, authors_map, same_authors):
     for (_, name), emails in same_authors.items():
         final_email = emails[0]
         for email in emails:
-            authors_map[email] = name
-            if email != final_email:
-                scores[final_email] += scores[email]
-                scores.pop(email,None)
+            if email in authors_map:
+                authors_map[email] = name
+                if email != final_email:
+                    scores[final_email] += scores[email]
+                    scores.pop(email,None)
     # blacklist
     scores.pop("action@github.com", None)
 
