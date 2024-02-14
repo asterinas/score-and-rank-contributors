@@ -50,7 +50,8 @@ def calculate_scores(repos, since_date):
             # Several merge pull request commit without statistics
             # <email> <message subject>
             # # file changed, # insertion(+), # deletion(-)
-            assert len(lines) >= 2, f"repo_path: {repo_path}, log_output: {repr(log_output)}"
+            if "Merge pull request" in lines[-1]: # single pr commit without statistics
+                continue
             parts = lines[-2].split(" ")
             email, _ = parts[0], " ".join(parts[1:])
 
