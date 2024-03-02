@@ -103,13 +103,14 @@ def parse_authors_file(file_path):
 def output_ranked_scores(scores, authors_map, same_authors):
     # merge the same contributors
     for (_, name), emails in same_authors.items():
-        final_email = emails[0]
-        for email in emails:
-            if email in authors_map:
-                authors_map[email] = name
-                if email != final_email:
-                    scores[final_email] += scores[email]
-                    scores.pop(email,None)
+        valid_emails = [email for email in emails if email in authors_map]
+        if not valid_emails: continue
+        final_email = valid_emails[0]
+        for email in valid_emails:
+            authors_map[email] = name
+            if email != final_email:
+                scores[final_email] += scores[email]
+                scores.pop(email,None)
     # blacklist
     scores.pop("action@github.com", None)
 
